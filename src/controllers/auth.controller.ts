@@ -17,7 +17,7 @@ const WEEK_IN_MILLISECONDS = 7 * 24 * 60 * 60 * 1000;
  */
 export const createAccount = async (req: Request, res: Response) => {
   try {
-    const { email, name, password } = req.body as UserCreationAttributes;
+    const { email, name, phone, password } = req.body as UserCreationAttributes;
 
     /**
      * hash the password
@@ -31,6 +31,7 @@ export const createAccount = async (req: Request, res: Response) => {
     const result = await User.create({
       email,
       name,
+      phone,
       password: hashedPassword,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -49,9 +50,13 @@ export const createAccount = async (req: Request, res: Response) => {
      * if the user is created, generate a token
      * and set the cookie with the token generated
      */
-    const token = sign({ id: result.id }, process.env.JWT_SECRET as string, {
-      expiresIn: WEEK_IN_MILLISECONDS,
-    });
+    const token = sign(
+      { id: result.id, isAdmin: result.dataValues.isAdmin },
+      process.env.JWT_SECRET as string,
+      {
+        expiresIn: WEEK_IN_MILLISECONDS,
+      }
+    );
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -98,23 +103,30 @@ export const login = async (req: Request, res: Response) => {
       return res.status(ERROR_UNAUTHORIZED).send("Email/Password is incorrect");
     }
 
-    const token = sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: WEEK_IN_MILLISECONDS,
-    });
+    const token = sign(
+      { id: user.id, isAdmin: user.dataValues.isAdmin },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: WEEK_IN_MILLISECONDS,
+      }
+    );
 
     /**
      * Set the cookie with the token generated
      */
     res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: WEEK_IN_MILLISECONDS,
       httpOnly: true,
     });
 
     /**
      * Return the user
      */
-    return res.status(STATUS_CREATED).send(user);
+    return res
+      .status(STATUS_CREATED)
+      .send({ ...user, token: token, password: undefined });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    return res.status(ERROR_INTERNAL_SERVER).send("Error logging in");
   }
 };

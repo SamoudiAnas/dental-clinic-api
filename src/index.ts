@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 
 import { sequelize } from "./database";
 import { authRoutes, userRoutes, appointmentRoutes } from "./routes";
+import { availabilityRouter } from "./routes/availability.route";
 
 /**
  * Application port
@@ -21,7 +22,12 @@ const port = process.env.PORT || 5000;
  */
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -33,6 +39,7 @@ app.use(cookieParser());
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/appointments", appointmentRoutes);
+app.use("/availability", availabilityRouter);
 
 /**
  * Start the express server
@@ -42,7 +49,6 @@ const start = async (): Promise<void> => {
     /**
      * Sync the database
      */
-
     await sequelize.authenticate();
     await sequelize.sync().then(async () => {
       console.log("Database synced");

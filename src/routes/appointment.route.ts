@@ -4,15 +4,17 @@ import {
   deleteAppointment,
   getAllAppointments,
   getAppointmentById,
+  getUserAppointments,
   updateAppointment,
 } from "../controllers";
-import { verifyToken } from "../middlewares/auth";
+import { authorizeToken } from "../middlewares/authorize-token";
 
 const router = Router();
 
-router.get("/", getAllAppointments);
-router.get("/:id", getAppointmentById);
-router.post("/create", verifyToken, createAppointment);
+router.get("/", authorizeToken, getAllAppointments);
+router.get("/user", authorizeToken, getUserAppointments);
+router.get("/:id", authorizeToken, getAppointmentById);
+router.post("/create", authorizeToken, createAppointment);
 router.put("/:id", updateAppointment);
 router.delete("/:id", deleteAppointment);
 

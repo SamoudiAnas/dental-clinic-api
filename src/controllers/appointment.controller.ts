@@ -16,16 +16,16 @@ import { checkIfDateIsInWeekend } from "../utils/date";
  */
 export const createAppointment = async (req: Request, res: Response) => {
   try {
-    const { date, duration } = req.body as AppointmentCreationAttributes;
+    const { date, startTime, endTime } =
+      req.body as AppointmentCreationAttributes;
 
     const userId = req["userId"];
-    console.log(userId);
 
     /**
      * Validate the data
      */
 
-    if (!date || !duration || !userId) {
+    if (!date || !startTime || !endTime || !userId) {
       return res.status(ERROR_INTERNAL_SERVER).json({ error: "Missing data" });
     }
 
@@ -41,22 +41,37 @@ export const createAppointment = async (req: Request, res: Response) => {
     /**
      * Check availability
      */
-    const appointment = await Appointment.findOne({
+    const appointments = await Appointment.findAll({
       where: { date },
     });
 
-    if (appointment) {
-      return res
-        .status(ERROR_INTERNAL_SERVER)
-        .json({ error: "Appointment on this date already exists" });
+    if (appointments.length > 0) {
+      const start = new Date(startTime);
+      const end = new Date(endTime);
+
+      for (let i = 0; i < appointments.length; i++) {
+        const appointment = appointments[i];
+        const appointmentStart = new Date(appointment.startTime);
+        const appointmentEnd = new Date(appointment.endTime);
+
+        if (
+          (start >= appointmentStart && start < appointmentEnd) ||
+          (end > appointmentStart && end <= appointmentEnd)
+        ) {
+          return res
+            .status(ERROR_INTERNAL_SERVER)
+            .json({ error: "Appointment already exists on this date" });
+        }
+      }
     }
 
     /**
      * Create the appointment
      */
     const result = await Appointment.create({
-      date,
-      duration,
+      date: date.toString().slice(0, 10),
+      startTime,
+      endTime,
       userId,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -87,7 +102,8 @@ export const createAppointment = async (req: Request, res: Response) => {
 export const updateAppointment = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
-    const { date, duration } = req.body as AppointmentCreationAttributes;
+    const { date, startTime, endTime } =
+      req.body as AppointmentCreationAttributes;
 
     const appointment = await Appointment.findByPk(id);
 
@@ -120,7 +136,8 @@ export const updateAppointment = async (req: Request, res: Response) => {
     }
 
     appointment.date = date;
-    appointment.duration = duration;
+    appointment.startTime = startTime;
+    appointment.endTime = endTime;
     appointment.updatedAt = new Date();
 
     await appointment.save();
@@ -190,5 +207,22 @@ export const deleteAppointment = async (req: Request, res: Response) => {
     res
       .status(ERROR_INTERNAL_SERVER)
       .json({ error: "Error deleting appointment" });
+  }
+};
+
+/**
+ * GET - appointments/user
+ * returns all appointments for the user
+ */
+export const getUserAppointments = async (req: Request, res: Response) => {
+  try {
+    const userId = req["userId"];
+    const result = await Appointment.findAll({ where: { userId } });
+    res.status(STATUS_OK).json({ appointments: result });
+  } catch (error) {
+    console.error("Error getting user appointments:", error);
+    res
+      .status(ERROR_INTERNAL_SERVER)
+      .json({ error: "Error getting user appointments" });
   }
 };

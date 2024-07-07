@@ -1,12 +1,13 @@
 import { sequelize } from "../database/";
 import { Model, DataTypes } from "sequelize";
 
-export type Duration = "30" | "60" | "90" | "120";
+export type Duration = "30" | "60" | "75" | "90" | "120";
 
 export class Appointment extends Model {
   public id?: number;
   public date!: Date;
-  public duration!: Duration;
+  public startTime!: Date;
+  public endTime!: Date;
   public userId!: number;
 
   public createdAt!: Date;
@@ -26,10 +27,15 @@ Appointment.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    duration: {
-      type: DataTypes.ENUM("30", "60", "90", "120"),
+    startTime: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
+    endTime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,

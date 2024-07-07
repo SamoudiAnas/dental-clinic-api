@@ -1,5 +1,5 @@
 import { sequelize } from "../database/";
-import { Model, Sequelize, DataTypes } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 
 export class User extends Model {
   public id?: number;
@@ -11,7 +11,7 @@ export class User extends Model {
   public birthdate?: Date;
   public country?: string;
 
-  private admin?: boolean;
+  public isAdmin?: boolean;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -52,7 +52,7 @@ User.init(
       type: DataTypes.STRING(100),
       allowNull: true,
     },
-    admin: {
+    isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
