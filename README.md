@@ -73,6 +73,10 @@ Here are some of the key API endpoints:
 
 - **GET /availability** : Check available time slots.
 
+### Contact
+
+- **POST /contact** : Create a contact message.
+
 ## Contributing
 
 We welcome contributions from the community. If you'd like to contribute to the project, please follow these guidelines:
