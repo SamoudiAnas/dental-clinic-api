@@ -124,7 +124,7 @@ export const login = async (req: Request, res: Response) => {
      */
     return res
       .status(STATUS_CREATED)
-      .send({ ...user, token: token, password: undefined });
+      .send({ user: user.dataValues, token: token, password: undefined });
   } catch (error) {
     console.error(error);
     return res.status(ERROR_INTERNAL_SERVER).send("Error logging in");

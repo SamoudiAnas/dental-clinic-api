@@ -10,7 +10,7 @@ export const createMessage = async (req: Request, res: Response) => {
   try {
     const {
       fullName = "",
-      phone = "",
+      phoneNumber = "",
       email = "",
       message = "",
     } = req.body as MessageCreationAttributes;
@@ -19,7 +19,7 @@ export const createMessage = async (req: Request, res: Response) => {
      * Validate the data
      */
 
-    if (!fullName || !phone || !message) {
+    if (!fullName || !phoneNumber || !message) {
       return res.status(ERROR_INTERNAL_SERVER).json({ error: "Missing data" });
     }
 
@@ -28,7 +28,7 @@ export const createMessage = async (req: Request, res: Response) => {
      */
     await Message.create({
       fullName,
-      phone,
+      phone: phoneNumber,
       email,
       message,
       createdAt: new Date(),

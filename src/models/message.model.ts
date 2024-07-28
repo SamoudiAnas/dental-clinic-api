@@ -5,7 +5,7 @@ export class Message extends Model {
   public id?: number;
   public fullName!: string;
   public email?: string;
-  public phone!: string;
+  public phoneNumber!: string;
   public message!: string;
 
   public readonly createdAt!: Date;
@@ -29,7 +29,7 @@ Message.init(
       allowNull: false,
     },
 
-    phone: {
+    phoneNumber: {
       type: DataTypes.STRING(100),
       allowNull: true,
     },

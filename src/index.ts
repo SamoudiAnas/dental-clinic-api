@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 import { sequelize } from "./database";
 import { authRoutes, userRoutes, appointmentRoutes } from "./routes";
 import { availabilityRouter } from "./routes/availability.route";
+import { messageRouter } from "./routes/message.route";
 
 /**
  * Application port
@@ -40,6 +41,7 @@ app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/appointments", appointmentRoutes);
 app.use("/availability", availabilityRouter);
+app.use("/contact", messageRouter);
 
 /**
  * Start the express server
