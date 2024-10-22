@@ -65,7 +65,7 @@ export const createAccount = async (req: Request, res: Response) => {
     });
 
     const newUser = result.dataValues as User;
-    return res.status(STATUS_CREATED).json({ user: newUser });
+    return res.status(STATUS_CREATED).json({ user: newUser, token });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(ERROR_INTERNAL_SERVER).json({ error: "Error creating user" });
@@ -104,7 +104,15 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = sign(
-      { id: user.id, isAdmin: user.dataValues.isAdmin },
+      {
+        id: user.id,
+        isAdmin: user.dataValues.isAdmin,
+        name: user.dataValues.name,
+        email: user.dataValues.email,
+        phone: user.dataValues.phone,
+        country: user.dataValues.country,
+        birthdate: user.dataValues.birthdate,
+      },
       process.env.JWT_SECRET,
       {
         expiresIn: WEEK_IN_MILLISECONDS,
@@ -114,7 +122,7 @@ export const login = async (req: Request, res: Response) => {
     /**
      * Set the cookie with the token generated
      */
-    res.cookie("jwt", token, {
+    res.cookie("token", token, {
       maxAge: WEEK_IN_MILLISECONDS,
       httpOnly: true,
     });
@@ -128,5 +136,20 @@ export const login = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     return res.status(ERROR_INTERNAL_SERVER).send("Error logging in");
+  }
+};
+
+/**
+ *  GET - users/get-user
+ *  get the user data
+ */
+export const getUser = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findByPk(req["userId"]);
+
+    return res.status(STATUS_CREATED).send(user);
+  } catch (error) {
+    console.error(error);
+    return res.status(ERROR_INTERNAL_SERVER).send("Error getting user");
   }
 };
