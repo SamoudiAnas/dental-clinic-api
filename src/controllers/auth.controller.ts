@@ -60,7 +60,8 @@ export const createAccount = async (req: Request, res: Response) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
+      sameSite: "none",
       maxAge: WEEK_IN_MILLISECONDS,
     });
 
@@ -125,6 +126,8 @@ export const login = async (req: Request, res: Response) => {
     res.cookie("token", token, {
       maxAge: WEEK_IN_MILLISECONDS,
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
     });
 
     /**
