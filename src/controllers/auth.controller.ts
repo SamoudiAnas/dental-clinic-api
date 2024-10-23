@@ -62,6 +62,8 @@ export const createAccount = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
+      domain: ".vercel.app",
+      path: "/",
       maxAge: WEEK_IN_MILLISECONDS,
     });
 
@@ -127,6 +129,8 @@ export const login = async (req: Request, res: Response) => {
       maxAge: WEEK_IN_MILLISECONDS,
       httpOnly: true,
       secure: true,
+      domain: ".vercel.app",
+      path: "/",
       sameSite: "none",
     });
 
