@@ -25,7 +25,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://dental-clinic-user.vercel.app",
+    origin: ["http://localhost:3000", "https://dental-clinic-user.vercel.app"],
     credentials: true,
   })
 );
